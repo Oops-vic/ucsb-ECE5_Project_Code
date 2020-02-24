@@ -28,7 +28,7 @@ bool b_sum(bool* b_array, int len);     //Determine if switch state is changed
 BLYNK_WRITE(V0){     //Set the number of switches (4 max)
   if (switchLen != param.asInt()){
     numIndicator = true;
-    switchLen = param.asInt();
+    switchLen = param.asInt() - 1;
   }
 }
 BLYNK_WRITE(V1){     //State of switch 1
@@ -90,6 +90,9 @@ void loop() {                         //switchStatus contains elements of on/off
   }
   for (int i = switchLen + 1; i <= MAXNUM; i++){
     Blynk.setProperty(i, "color", BLYNK_RED);
+    Blynk.virtualWrite(i,2);
+    Blynk.syncVirtual(i);
+    switchStatus[i - 1] = 2;
   }
   for (int i = 0; i < switchLen; i++){
     Serial.println(switchStatus[i]);
