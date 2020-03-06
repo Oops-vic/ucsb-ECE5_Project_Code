@@ -155,7 +155,7 @@ void onServoShift(){
   for (int i = 0; i < switchLen; i++){
       if (switchStatus[i] == 1) binaryCmd += power(2, i);
   }
-  for (int i = offAngle; i <= onAngle; i += 2) { 
+  for (int i = offAngle; i <= onAngle; i++) { 
     digitalWrite(latchPin ,LOW); 
     shiftOut(dataPin ,clockPin ,MSBFIRST, binaryCmd); 
     digitalWrite(latchPin ,HIGH); 
@@ -173,7 +173,7 @@ void offServoShift(){
   for (int i = 0; i < switchLen; i++){
       if (switchStatus[i] == 2) binaryCmd += power(2, i);
   }
-  for (int i = onAngle; i <= offAngle; i += 2) { 
+  for (int i = onAngle; i <= offAngle; i++) { 
     digitalWrite(latchPin ,LOW); 
     shiftOut(dataPin ,clockPin ,MSBFIRST, binaryCmd); 
     digitalWrite(latchPin ,HIGH); 
