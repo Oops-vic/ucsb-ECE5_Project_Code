@@ -23,9 +23,9 @@ Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_CS, BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_
 
 unsigned short int switchStatus[MAXNUM], switchLen = 0;
 bool changeVar[MAXNUM], numIndicator = false;
-const short int dataPin =8; 
-const short int clockPin =10; 
-const short int latchPin =9;
+const short int dataPin = 9; 
+const short int clockPin = 5; 
+const short int latchPin = 6;
 
 void error(const);                            //Give out error messages
 void initialButtonColor();                    //Initialization process
@@ -173,7 +173,7 @@ void offServoShift(){
   for (int i = 0; i < switchLen; i++){
       if (switchStatus[i] == 2) binaryCmd += power(2, i);
   }
-  for (int i = onAngle; i <= offAngle; i++) { 
+  for (int i = onAngle; i >= offAngle; i--) { 
     digitalWrite(latchPin ,LOW); 
     shiftOut(dataPin ,clockPin ,MSBFIRST, binaryCmd); 
     digitalWrite(latchPin ,HIGH); 
