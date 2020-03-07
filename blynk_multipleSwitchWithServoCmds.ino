@@ -35,7 +35,7 @@ void offServoShift();                         //Off commands for all attachments
 int power(int, int);                          //Calculate the power with return value int
 
 BLYNK_WRITE(V0){     //Set the number of switches (4 max)
-  if (switchLen != param.asInt()){
+  if (switchLen != param.asInt() - 1){
     numIndicator = true;
     switchLen = param.asInt() - 1;
   }
@@ -111,6 +111,8 @@ void loop() {                         //switchStatus contains elements of on/off
     Serial.println(switchStatus[i]);
   }
   Serial.println("***********");
+  Serial.println(switchLen);
+  Serial.println("/*********/");
   onServoShift();
   offServoShift();
 /*****************Re-initialize bool indicators*****************/
@@ -146,14 +148,14 @@ bool b_sum(bool* b_array, int len){
 }
 
 int power(int num, int p){
-    if (p == 1) return num;
+    if (p == 0) return num;
     return num * power(num, p - 1);
 }
 
 void onServoShift(){
   int binaryCmd = 0;
   for (int i = 0; i < switchLen; i++){
-      if (switchStatus[i] == 1) binaryCmd += power(2, i);
+      if (switchStatus[i] == 1 && changeVar[i]) binaryCmd += power(2, i);
   }
   for (int i = offAngle; i <= onAngle; i++) { 
     digitalWrite(latchPin ,LOW); 
@@ -171,7 +173,7 @@ void onServoShift(){
 void offServoShift(){
   int binaryCmd = 0;
   for (int i = 0; i < switchLen; i++){
-      if (switchStatus[i] == 2) binaryCmd += power(2, i);
+      if (switchStatus[i] == 2 && changeVar[i]) binaryCmd += power(2, i);
   }
   for (int i = onAngle; i >= offAngle; i--) { 
     digitalWrite(latchPin ,LOW); 
