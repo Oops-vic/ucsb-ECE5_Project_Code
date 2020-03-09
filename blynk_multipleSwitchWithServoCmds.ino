@@ -30,8 +30,8 @@ const short int latchPin = 6;
 void error(const);                            //Give out error messages
 void initialButtonColor();                    //Initialization process
 bool b_sum(bool* b_array, short int len);     //Determine if switch state is changed
-void onServoShift();                          //On commands for all attachments
-void offServoShift();                         //Off commands for all attachments
+void onServoShift(short int);                 //On commands for all attachments
+void offServoShift(short int);                //Off commands for all attachments
 int power(int, int);                          //Calculate the power with return value int
 
 BLYNK_WRITE(V0){     //Set the number of switches (4 max)
@@ -111,10 +111,15 @@ void loop() {                         //switchStatus contains elements of on/off
     Serial.println(switchStatus[i]);
   }
   Serial.println("***********");
-  Serial.println(switchLen);
-  Serial.println("/*********/");
-  onServoShift();
-  offServoShift();
+  short int onBinary = 0, offBinary = 0;
+  for (int i = 0; i < switchLen; i++){
+      if (switchStatus[i] == 1 && changeVar[i]) onBinary += power(2, i);
+  }
+  for (int i = 0; i < switchLen; i++){
+      if (switchStatus[i] == 2 && changeVar[i]) offBinary += power(2, i);
+  }
+  if (onBinary) onServoShift(onBinary);
+  if (offBinary) offServoShift(offBinary);
 /*****************Re-initialize bool indicators*****************/
   numIndicator = false;
   for (int i = 0; i < MAXNUM; i++){
@@ -148,18 +153,17 @@ bool b_sum(bool* b_array, int len){
 }
 
 int power(int num, int p){
-    if (p == 0) return num;
+    if (p == 0) return 1;
     return num * power(num, p - 1);
 }
 
-void onServoShift(){
-  int binaryCmd = 0;
-  for (int i = 0; i < switchLen; i++){
-      if (switchStatus[i] == 1 && changeVar[i]) binaryCmd += power(2, i);
-  }
+void onServoShift(short int onBinary){
+  Serial.print("On binary:");
+  Serial.println(onBinary);
+  Serial.println("***********");
   for (int i = offAngle; i <= onAngle; i++) { 
     digitalWrite(latchPin ,LOW); 
-    shiftOut(dataPin ,clockPin ,MSBFIRST, binaryCmd); 
+    shiftOut(dataPin ,clockPin ,MSBFIRST, onBinary); 
     digitalWrite(latchPin ,HIGH); 
     delayMicroseconds(map(i, 0, 180, 400, 2500));
     digitalWrite(latchPin ,LOW); 
@@ -170,14 +174,13 @@ void onServoShift(){
   }
 }
 
-void offServoShift(){
-  int binaryCmd = 0;
-  for (int i = 0; i < switchLen; i++){
-      if (switchStatus[i] == 2 && changeVar[i]) binaryCmd += power(2, i);
-  }
+void offServoShift(short int offBinary){
+  Serial.print("Off binary:");
+  Serial.println(offBinary);
+  Serial.println("***********");
   for (int i = onAngle; i >= offAngle; i--) { 
     digitalWrite(latchPin ,LOW); 
-    shiftOut(dataPin ,clockPin ,MSBFIRST, binaryCmd); 
+    shiftOut(dataPin ,clockPin ,MSBFIRST, offBinary); 
     digitalWrite(latchPin ,HIGH); 
     delayMicroseconds(map(i, 0, 180, 400, 2500));
     digitalWrite(latchPin ,LOW); 
